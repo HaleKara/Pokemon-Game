@@ -1,0 +1,211 @@
+Arkadaşlar merhaba;
+
+Bu ödevimizde Pokemon oyununu kodlamaya çalışacağız. Öncelikle UML diagramını dikkatlica incelemenizi istiyorum.
+UML diyagramında 0..1 veya 0...* şeklinde gördüğünüz yerler has-a ilişkisini göstermektedir. Yani örneğin player 0 veya daha fazla Character'e sahip olabilir şeklinde.
+
+
+Oyunumuzda temel olarak 2 oyuncu ve bunların sahip olduğu ikişer pokemon olacaktır. 2 sayısı nettir, direk olarak ikilik bir Character arrayi açabilirsiniz.
+
+Her oyuncunun ismi construction anında alınmalıdır.
+
+Oyun başladığında oyuncularımızın sağlığı 100 olacaktır.
+
+Once player1 sonra player2 saldırısına yapacaktır. Bu şekilde saldırılar birinin sağlığı 0'ın altına inene kadar devam edecektir.
+
+Her bir pokemon power özeliğine sahiptir ve bir pokemon saldırıda kullanıldığında karşı taraftaki rakibin sağlığını power'ı kadar azaltmaktadır. 
+
+Ödevimizde Pokemon characterlerimiz olacaktır. Bunlar Pikachu, Misty, Charizard'dır.
+
+Oyunu başlatmadan önce oyuncuları ve bunların pokemonlarını oluşturacaksınız. 
+
+Daha sonra sırayla oyuncuları birbirine saldırtacaksınız; ta ki birinin canı 0'ın altına inene kadar.
+
+Pokemonları sırayla saldırtacaksınız. Eğer 2 pokemon kullanıldığında oyun bitmedi ise pokemonlar tekrar baştan saldırılarını yapmaya devam edecektir. Oyun sadece birinin sağlığı 0'ın altına düşünce bitebilir.
+
+Her saldırıdan sonra ekrana saldırıyı yapan character hakkında bilgi yazmanızı istiyorum. Ve her bir tur tamamlandığında(yani 1 ve 2 saldırısını yaptığında) ekrana oyuncuların sağlık durumlarını yazmanızı istiyorum.
+
+Boost durumu
+Bazı pokemonların sahibinin sağlığı 10'un altına düştüğü zaman bir anda gaza gelip saldırı gücünü iki katına çıkarabilmektedir. Bizi sistemimizde bu Pikachu olacaktır.
+Pikachu sınıfı Boostable interface'ini implement edecektir ve bir şekilde bir aşamada pikachunun boost methodunu çağırmanızı bekliyorum eğer sahibinin sağlığı 10'dan daha düşükse.
+
+Her karakterin name'i ve poweri vardır. Bunlardan power dışardan alınıp yaratım anında super() ile üst tarafa paslanmalıdır. Name sınıf geneli sabittir. Yani Pikachu sınıfı için isim her zaman Pikachudur. Dolaysıyla bunu dışardan almadan direk içerde Pikachu olarak belileyebiliriz veya Misty sınıfı için Misty şeklinde belirleyebiliriz.
+
+public Misty(int power) {
+    super("Misty", power);
+}
+
+Örnek kodlar
+
+Oyuncuları yaratma (Application sınıfınızda bu şekilde yapmanız lazım)
+
+Player player1 = new Player("Abdullah");
+Player player2 = new Player("Bulut");
+
+/* character'leri yaratma */
+Character[] player1Characters = new Character[2];
+Character[] player2Characters = new Character[2];
+
+player1Characters[0] = new Pikachu(15);
+player1Characters[1] = new Misty(22);
+
+player2Characters[0] = new Charizard(18);
+player2Characters[1] = new Pikachu(23);
+
+player1.setCharacters(player1Characters);
+player2.setCharacters(player2Characters);
+
+/* oyunu başlatma */
+PokemonGame game = new PokemonGame(player1, player2);
+game.start();
+
+
+/* game start methodu ornek başlangıç */
+
+while(player1.getHealth() > 0 && player2.getHealth() > 0) {
+			
+		Character player1Character = player1.getNextCharacter();
+		Character player2Character = player2.getNextCharacter();
+		
+		if(player1.getHealth() < 10 && player1Character instanceof Boostable) {
+			Boostable p = (Boostable) player1Character;
+			p.boost();
+		}
+		player1Character.hit(player2);
+		
+		if(!player2.isAlive()) {
+			this.printResult();
+			return;
+		}
+
+..............
+...............
+.................
+..................
+.....................
+.....................
+.....................
+
+}
+
+
+Hit methodu içinde düşmanı alacaktır ve düşmanın canını kendi power'i kadar azaltacaktır.
+
+/* hit methodu örnek */
+public void hit(Player enemy) {
+		this.printAttackDetail();
+		enemy.setHealth(enemy.getHealth() - this.power);
+};
+	
+public void printAttackDetail() {
+	System.out.println("Character name : " + this.characterName);
+	System.out.println("Power : " + this.power);
+    System.out.println("--------------");
+}
+
+
+Örnek çıktı
+
+Character name : Pikachu
+Power : 10
+Character is Boostable
+--------------
+Character name : Charizard
+Power : 13
+--------------
+Turn result : 
+Player1 name : Abdullah
+Player2 name : Bulut
+Player1 health : 87
+Player2 health: 90
+
+Character name : Misty
+Power : 17
+--------------
+Character name : Pikachu
+Power : 10
+Character is Boostable
+--------------
+Turn result : 
+Player1 name : Abdullah
+Player2 name : Bulut
+Player1 health : 77
+Player2 health: 73
+
+Character name : Pikachu
+Power : 10
+Character is Boostable
+--------------
+Character name : Charizard
+Power : 13
+--------------
+Turn result : 
+Player1 name : Abdullah
+Player2 name : Bulut
+Player1 health : 64
+Player2 health: 63
+
+Character name : Misty
+Power : 17
+--------------
+Character name : Pikachu
+Power : 10
+Character is Boostable
+--------------
+Turn result : 
+Player1 name : Abdullah
+Player2 name : Bulut
+Player1 health : 54
+Player2 health: 46
+
+Character name : Pikachu
+Power : 10
+Character is Boostable
+--------------
+Character name : Charizard
+Power : 13
+--------------
+Turn result : 
+Player1 name : Abdullah
+Player2 name : Bulut
+Player1 health : 41
+Player2 health: 36
+
+Character name : Misty
+Power : 17
+--------------
+Character name : Pikachu
+Power : 10
+Character is Boostable
+--------------
+Turn result : 
+Player1 name : Abdullah
+Player2 name : Bulut
+Player1 health : 31
+Player2 health: 19
+
+Character name : Pikachu
+Power : 10
+Character is Boostable
+--------------
+Character name : Charizard
+Power : 13
+--------------
+Turn result : 
+Player1 name : Abdullah
+Player2 name : Bulut
+Player1 health : 18
+Player2 health: 9
+
+Character name : Misty
+Power : 17
+--------------
+Player1 name : Abdullah
+Player2 name : Bulut
+Player1 health : 18
+Player2 health: -8
+
+
+Kolay gelsin, her türlü sorunuzda bana hızlıca sormanızı bekliyorum.
+
+
+
